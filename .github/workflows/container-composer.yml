@@ -1,10 +1,10 @@
-name: Creates ThemeBuild Composer Container 
+name: Creates Composer Container from upstream 
 
 on:
   push:
-    branches: [ container-build ]
+    branches: [ container-build-composer1 ]
   pull_request:
-    branches: [ container-build ]
+    branches: [ container-build-composer1 ]
 
 jobs:
   build:
