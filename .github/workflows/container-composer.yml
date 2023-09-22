@@ -2,9 +2,9 @@ name: Creates Composer Container from upstream
 
 on:
   push:
-    branches: [ container-build-composer1 ]
+    branches: [ container-build-composer ]
   pull_request:
-    branches: [ container-build-composer1 ]
+    branches: [ container-build-composer ]
 
 jobs:
   build:
@@ -50,7 +50,13 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
-          
+
+      - name: Package Composer Output
+        uses: actions/upload-artifact@v3
+        with:
+          name: composer--package
+          path: var/www/
+      
       - name: Security scan
         uses: anchore/scan-action@v3
         with:
