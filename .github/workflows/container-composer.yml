@@ -54,8 +54,8 @@ jobs:
       - name: Package Composer Output
         uses: actions/upload-artifact@v3
         with:
-          name: composer--package
-          path: var/www/
+          name: composer-www-package
+          path: /var/www/
       
       - name: Security scan
         uses: anchore/scan-action@v3
