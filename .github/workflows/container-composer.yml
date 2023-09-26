@@ -52,7 +52,7 @@ jobs:
           platforms: linux/amd64, linux/arm64
           
       - name: Tar files
-        run: tar -cvf composer-www-package.tar /var/www/web/themes
+        run: tar -cvf composer-www-package.tar /var/www
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
