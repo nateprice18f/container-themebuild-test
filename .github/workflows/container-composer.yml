@@ -50,12 +50,21 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
-
-      - name: Package Composer Output
+          
+      - name: Tar files
+        run: tar -cvf composer-www-package.tar /var/www
+        
+      - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: composer-www-package
-          path: /var/**
+          path: composer-www-package.tar
+        
+      #- name: Package Composer Output
+      #  uses: actions/upload-artifact@v3
+      #  with:
+      #    name: composer-www-package
+      #    path: /var/**/
       
       - name: Security scan
         uses: anchore/scan-action@v3
