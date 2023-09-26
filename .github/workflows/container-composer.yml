@@ -50,15 +50,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
-          
-      - name: Tar files
-        run: tar -cvf composer-www-package.tar /var/www
-        
+                  
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: composer-www-package
-          path: composer-www-package.tar
+          path: /var/www/web/themes
         
       #- name: Package Composer Output
       #  uses: actions/upload-artifact@v3
