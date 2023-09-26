@@ -45,7 +45,7 @@ RUN mkdir -p /var/www \
     && chown www-data:www-data /var/www/drush/Commands \
     && chown www-data:www-data /var/www/drush/Commands/contrib
 
-WORKDIR var/www/web/themes
+WORKDIR /var/www
 
 USER www-data
 
