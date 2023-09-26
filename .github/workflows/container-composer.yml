@@ -55,7 +55,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: composer-www-package
-          path: /var/www/
+          path: /var/**
       
       - name: Security scan
         uses: anchore/scan-action@v3
