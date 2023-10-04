@@ -18,7 +18,7 @@ jobs:
         run: mkdir -p /tmp/artifact
         
       - name: Copy files to temporary folder
-        run: cp -r /var/www/web/themes /tmp/artifact
+        run: cp -r /var/www /tmp/artifact
         
       - name: Generate Docker metadata
         id: meta
