@@ -5,13 +5,14 @@ ARG BGID=1000
 ARG BUILD_ENV
 ENV BUILD_ENV ${BUILD_ENV:-none}
 
+WORKDIR /var/www
+
 COPY --chown=www-data:www-data composer.json /var/www/composer.json
 COPY --chown=www-data:www-data composer.lock /var/www/composer.lock
 COPY --chown=www-data:www-data patches /var/www/patches
 
 # pulled from composer.json installer-paths
-RUN mkdir -p /var/www \
-    && mkdir -p /var/www/vendor \
+RUN mkdir -p /var/www/vendor \
     && mkdir -p /var/www/web \
     && mkdir -p /var/www/web/core \
     && mkdir -p /var/www/web/libraries \
@@ -44,8 +45,6 @@ RUN mkdir -p /var/www \
     && chown www-data:www-data /var/www/drush \
     && chown www-data:www-data /var/www/drush/Commands \
     && chown www-data:www-data /var/www/drush/Commands/contrib
-
-WORKDIR /var/www
 
 USER www-data
 
