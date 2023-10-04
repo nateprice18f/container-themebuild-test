@@ -14,9 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Create temporary folder
-        run: mkdir -p /tmp/artifact
-        
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -53,15 +50,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
-          
-      - name: Copy files to temporary folder
-        run: cp -r /github/workspace /tmp/artifact
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: composer-www-package
-          path: /tmp/artifact
+          path: $ {{ github.workspace }}/var/www
         
       #- name: Package Composer Output
       #  uses: actions/upload-artifact@v3
