@@ -1,56 +1,46 @@
-name: Creates Composer Container from upstream 
+name: Get and upload workdirs
 
-on:
-  push:
-    branches: [ container-build-composer ]
-  pull_request:
-    branches: [ container-build-composer ]
+# Triggers the workflow on push or pull request events
+on: [push, pull_request]
 
 jobs:
+  # This job builds the docker image and gets the workdirs from it
   build:
-    name: Build Container Images
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Build and push image to Docker Hub
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          context: .
-          tags: container:latest
-          #labels: ${{ steps.meta.outputs.labels }}
-          #platforms: linux/amd64, linux/arm64
-          
-      - name: Get container ID
-        id: container
-        run: echo "::set-output name=id::$(docker create image)"
+      # Checks out the repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-      - name: copy workdir
-        run: docker cp ${{ steps.container.outputs.id }}:/workdir .workdir
+      # Builds the docker image using the Dockerfile in the repository
+      - name: Build docker image
+        run: docker build -t my-image .
 
-      - name: Remove Workdir
-        run: docker rm ${{ steps.container.outputs.id }}
+      # Gets the list of workdirs from the image
+      - name: Get workdirs
+        id: workdirs
+        run: echo "::set-output name=list::$(docker inspect --format='{{range .Config.WorkingDir}}{{.}} {{end}}' my-image)"
 
-      - name: Zip
-        run: zip -r workdir.zip workdir
-        
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+      # Loops through each workdir and copies it from the container to the host
+      - name: Copy workdirs
+        run: |
+          for workdir in ${{ steps.workdirs.outputs.list }}; do
+            docker cp my-container:$workdir ./workdir-$workdir
+          done
+
+      # Zips each workdir folder
+      - name: Zip workdirs
+        run: |
+          for workdir in ${{ steps.workdirs.outputs.list }}; do
+            zip -r workdir-$workdir.zip workdir-$workdir
+          done
+
+      # Uploads each zip file as an artifact for the workflow
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: composer-www-package
-          path: workdir.zip
-        
-      #- name: Package Composer Output
-      #  uses: actions/upload-artifact@v3
-      #  with:
-      #    name: composer-www-package
-      #    path: /var/**/
-      
-      - name: Security scan
-        uses: anchore/scan-action@v3
-        with:
-          image-reference: "ubuntu:latest"
-          fail-build: true
+          name: my-artifacts
+          path: |
+            workdir-*.zip
