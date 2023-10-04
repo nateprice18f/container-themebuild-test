@@ -20,8 +20,8 @@ jobs:
         with:
           push: true
           context: .
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: container:latest
+          #labels: ${{ steps.meta.outputs.labels }}
           #platforms: linux/amd64, linux/arm64
           
       - name: Get container ID
