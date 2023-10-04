@@ -1,19 +1,25 @@
 name: Buildx and upload artifact
 
 # Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on:
+  push:
+    branches: [ container-build-composer ]
+  pull_request:
+    branches: [ container-build-composer ]
 
 jobs:
   # This job uses docker buildx to build the image from the Dockerfile and uploads the WORKDIR as an artifact
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest 
+    name: Build Docker Images
+    steps:
     # Sets up QEMU, Docker and Buildx
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Setup Docker Buildx 
+        uses: docker/setup-buildx-action@v2.5.0
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
