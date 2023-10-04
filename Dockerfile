@@ -1,4 +1,4 @@
-FROM composer:latest
+FROM composer:latest AS composer-builder
 
 ARG BUID=1000
 ARG BGID=1000
