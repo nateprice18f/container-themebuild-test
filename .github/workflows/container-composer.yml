@@ -55,7 +55,7 @@ jobs:
           platforms: linux/amd64, linux/arm64
           
       - name: Copy files to temporary folder
-        run: cp -r /var/www /tmp/artifact
+        run: cp -r /github/workspace /tmp/artifact
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
