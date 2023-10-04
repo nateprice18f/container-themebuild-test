@@ -1,52 +1,53 @@
-name: Get and upload workdirs
+name: Buildx and upload artifact
 
 # Triggers the workflow on push or pull request events
-on:
-  push:
-    branches: [ container-build-composer ]
-  pull_request:
-    branches: [ container-build-composer ]
+on: [push, pull_request]
 
 jobs:
-  # This job builds the docker image and gets the workdirs from it
+  # This job uses docker buildx to build the image from the Dockerfile and uploads the WORKDIR as an artifact
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    # Sets up QEMU, Docker and Buildx
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks out the repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Builds the docker image using the Dockerfile in the repository
+      # Builds the docker image using docker buildx and the Dockerfile in the repository
       - name: Build docker image
-        run: docker build -t my-image .
+        run: docker buildx build --load -t my-image .
 
-      # Gets the list of workdirs from the image
-      - name: Get workdirs
-        id: workdirs
-        run: echo "::set-output name=list::$(docker inspect --format='{{range .Config.WorkingDir}}{{.}} {{end}}' my-image)"
+      # Gets the WORKDIR from the image
+      - name: Get WORKDIR
+        id: workdir
+        run: echo "::set-output name=path::$(docker inspect --format='{{.Config.WorkingDir}}' my-image)"
 
-      # Loops through each workdir and copies it from the container to the host
-      - name: Copy workdirs
-        run: docker cp composer-builder:/var/www ./workdir-$workdir
-     # - name: Copy workdirs
-     #   run: |
-     #     for workdir in ${{ steps.workdirs.outputs.list }}; do
-     #       docker cp my-container:$workdir ./workdir-$workdir
-     #     done
+      # Creates a temporary container from the image
+      - name: Create container
+        run: docker create --name my-container my-image
 
-      # Zips each workdir folder
-      - name: Zip workdirs
-        run: |
-          for workdir in ${{ steps.workdirs.outputs.list }}; do
-            zip -r workdir-$workdir.zip workdir-$workdir
-          done
+      # Copies the WORKDIR from the container to the host
+      - name: Copy WORKDIR
+        run: docker cp my-container:${{ steps.workdir.outputs.path }} ./workdir
 
-      # Uploads each zip file as an artifact for the workflow
-      - name: Upload artifacts
+      # Removes the temporary container
+      - name: Remove container
+        run: docker rm my-container
+
+      # Zips the WORKDIR folder
+      - name: Zip WORKDIR
+        run: zip -r workdir.zip workdir
+
+      # Uploads the zip file as an artifact for the workflow
+      - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: my-artifacts
-          path: |
-            workdir-*.zip
+          name: my-artifact
+          path: workdir.zip
