@@ -8,11 +8,17 @@ on:
 
 jobs:
   build:
-    name: Build Docker Images
+    name: Build Container Images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        
+      - name: Create temporary folder
+        run: mkdir -p /tmp/artifact
+        
+      - name: Copy files to temporary folder
+        run: cp -r /var/www/web/themes /tmp/artifact
         
       - name: Generate Docker metadata
         id: meta
@@ -55,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: composer-www-package
-          path: /var/www/web/themes
+          path: /tmp/artifact
         
       #- name: Package Composer Output
       #  uses: actions/upload-artifact@v3
