@@ -1,7 +1,11 @@
 name: Get and upload workdirs
 
 # Triggers the workflow on push or pull request events
-on: [push, pull_request]
+on:
+  push:
+    branches: [ container-build-composer ]
+  pull_request:
+    branches: [ container-build-composer ]
 
 jobs:
   # This job builds the docker image and gets the workdirs from it
