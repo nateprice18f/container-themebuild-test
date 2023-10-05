@@ -1,3 +1,4 @@
+
 name: Buildx and upload artifact
 
 # Triggers the workflow on push or pull request events
@@ -9,7 +10,7 @@ on:
 
 jobs:
   # This job uses docker buildx to build the image from the Dockerfile and uploads the WORKDIR as an artifact
-  build:
+  compose:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest 
     name: Build Docker Images
@@ -21,32 +22,32 @@ jobs:
 
       # Builds the docker image using docker buildx and the Dockerfile in the repository
       - name: Build docker image
-        run: docker buildx build --load -t my-image .
+        run: docker buildx build --load -t compose-image .
 
       # Gets the WORKDIR from the image
       - name: Get WORKDIR
         id: workdir
-        run: echo "::set-output name=path::$(docker inspect --format='{{.Config.WorkingDir}}' my-image)"
+        run: echo "::set-output name=path::$(docker inspect --format='{{.Config.WorkingDir}}' compose-image)"
 
       # Creates a temporary container from the image
       - name: Create container
-        run: docker create --name my-container my-image
+        run: docker create --name build-container compose-image
 
       # Copies the WORKDIR from the container to the host
       - name: Copy WORKDIR
-        run: docker cp my-container:${{ steps.workdir.outputs.path }} ./workdir
+        run: docker cp build-container:${{ steps.workdir.outputs.path }} ./var/www
 
       # Removes the temporary container
       - name: Remove container
-        run: docker rm my-container
+        run: docker rm build-container
 
       # Zips the WORKDIR folder
-      - name: Zip WORKDIR
-        run: zip -r workdir.zip workdir
+      #- name: Zip WORKDIR
+      #  run: zip -r /var/www var-www-artifact
 
       # Uploads the zip file as an artifact for the workflow
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: my-artifact
-          path: workdir.zip
+          name: var-www-artifact
+          path: var-www-artifact
