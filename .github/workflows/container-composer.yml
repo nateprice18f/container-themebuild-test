@@ -35,7 +35,7 @@ jobs:
 
       # Copies the WORKDIR from the container to the host
       - name: Copy WORKDIR
-        run: docker cp build-container:${{ steps.workdir.outputs.path }} ./var/www
+        run: docker cp build-container:${{ steps.workdir.outputs.path }} ./workdir
 
       # Removes the temporary container
       - name: Remove container
