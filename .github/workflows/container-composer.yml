@@ -54,5 +54,20 @@ jobs:
       - name: Security scan
         uses: anchore/scan-action@v3
         with:
-          image-reference: "ubuntu:latest"
+          image-reference: "natep18f/container-themebuild-test:container-build-composer"
           fail-build: true
+
+      - name: Pull Image
+        #run: docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/
+        run: docker pull natep18f/container-themebuild-test:container-build-composer
+        
+      - name: Copy workdir
+        #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
+        run: docker cp natep18f/container-themebuild-test:container-build-composer:/workdir www
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: www
+          path: www
+    
