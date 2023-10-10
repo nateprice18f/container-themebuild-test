@@ -2,9 +2,9 @@ name: Creates ThemeBuild Composer Container
 
 on:
   push:
-    branches: [ container-build-themebuild ]
+    branches: [ container-build-themebuild1 ]
   pull_request:
-    branches: [ container-build-themebuild ]
+    branches: [ container-build-themebuild1 ]
 
 jobs:
   build:
