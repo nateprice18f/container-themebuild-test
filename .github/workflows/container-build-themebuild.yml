@@ -18,7 +18,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: www
-          path: /var/www/
+          path: ${{ github.workspace }}/var/www
         
       - name: Generate Docker metadata
         id: meta
