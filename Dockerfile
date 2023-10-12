@@ -45,8 +45,6 @@ RUN mkdir -p /var/www \
     && chown www-data:www-data /var/www/drush/Commands \
     && chown www-data:www-data /var/www/drush/Commands/contrib
 
-WORKDIR /var/www
-
 USER www-data
 
 RUN composer -n config --global allow-plugins true \
@@ -55,3 +53,4 @@ RUN composer -n config --global allow-plugins true \
     && $COMPOSER_DIR/vendor/bin/phpcs --config-set installed_paths $COMPOSER_DIR/vendor/drupal/coder/coder_sniffer,$COMPOSER_DIR/vendor/sirbrillig/phpcs-variable-analysis,$COMPOSER_DIR/vendor/slevomat/coding-standard
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --ignore-platform-reqs --no-interaction --optimize-autoloader \
     && chown www-data:www-data /var/www/composer.json /var/www/composer.lock
+WORKDIR /var/www
