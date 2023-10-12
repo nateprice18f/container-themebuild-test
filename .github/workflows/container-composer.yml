@@ -2,9 +2,9 @@ name: Creates Composer Container from upstream
 
 on:
   push:
-    branches: [ container-build-composer1 ]
+    branches: [ contiainer-theme1 ]
   pull_request:
-    branches: [ container-build-composer1 ]
+    branches: [ contiainer-theme1 ]
 
 jobs:
   compose:
@@ -46,6 +46,8 @@ jobs:
       - name: Build and push image to Docker Hub
         uses: docker/build-push-action@v4
         with:
+          context: .
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -56,35 +58,35 @@ jobs:
         with:
           image-reference: "natep18f/container-themebuild-test:container-build-composer"
           fail-build: true
-
-      - name: Pull Image
-        #run: docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/
-        run: docker pull natep18f/container-themebuild-test:container-build-composer
-        
-      - name: Copy workdir
-        #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
-        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www www
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: www
-          path: www
           
+  #pull-var-www:
+  #  name: Pull /var/www from docker image
+  #  needs: compose
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #     - name: Pull image
+  #       run: docker pull natep18f/container-themebuild-test:container-build-composer
+  #     - name: Pull folder from docker image
+  #       run: docker run --rm -v ${{ github.workspace }}:/var/www ontainer-themebuild-test:container-build-composer cp -r /var/www 
+     
+     # - name: Copy workdir
+        #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
+        #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www www
+      
   build-theme:
-    needs: compose
     name: Builds themebuilder packages
-    runs-on: ubuntu-latest
-    
+    #needs: pull-var-www
+    needs: compose
+    runs-on: natep18f/container-themebuild-test:container-build-composer
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: www
-          path: ${{ github.workspace }}/var/www
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v2
+      #  with:
+      #    name: www
+      #    path: ${{ github.workspace }}/var/www
         
       - name: Generate Docker metadata
         id: meta
@@ -130,3 +132,15 @@ jobs:
         with:
           image-reference: "ubuntu:latest"
           fail-build: true
+          
+    #name: Create artifact of both compose and themebuild
+    #needs: build-theme
+    #steps:
+      - name: tar folder
+        run: tar -cvf themebuild.zip /var/www
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: themebuild
+          path: themebuild.zip
