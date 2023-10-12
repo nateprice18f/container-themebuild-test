@@ -71,6 +71,8 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Pull image
         run: docker pull natep18f/container-themebuild-test:container-build-composer
+      - name: Make folder
+        run: mkdir /var/www
       - name: Pull folder from docker image
         run: docker run --rm -v ${{ github.workspace }}:/var/www natep18f/container-themebuild-test:container-build-composer cp -r /var/www 
      
