@@ -72,7 +72,7 @@ jobs:
       - name: Pull image
         run: docker pull natep18f/container-themebuild-test:container-build-composer
       - name: Pull folder from docker image
-        run: docker run --rm -v ${{ github.workspace }}:/var/www container-themebuild-test cp -r /var/www 
+        run: docker run --rm -v ${{ github.workspace }}:/var/www natep18f/container-themebuild-test:container-build-composer cp -r /var/www 
      
      # - name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
