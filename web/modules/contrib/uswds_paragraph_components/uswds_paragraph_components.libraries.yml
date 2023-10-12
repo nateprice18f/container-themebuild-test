@@ -1,0 +1,29 @@
+uswds-accordion:
+  css:
+    component:
+      components/accordion/uswds-paragraph-components-accordion.css: { preprocess: false, minified: true }
+
+uswds-alerts:
+  css:
+    component:
+      components/alert/uswds-paragraph-components-alerts.css: { preprocess: false, minified: true }
+
+uswds-cards:
+  css:
+    component:
+      components/cards/uswds-paragraph-components-cards.css: { preprocess: false, minified: true }
+
+uswds-grid-layout:
+  css:
+    component:
+      components/grid-layout/uswds-paragraph-components-grid-layout.css: { preprocess: false, minified: true }
+
+uswds-modal:
+  css:
+    component:
+      components/modal/uswds-paragraph-components-modal.css: { preprocess: false, minified: true }
+
+uswds-step-indicator-list:
+  css:
+    component:
+      components/step-indicator-list/uswds-paragraph-components-step-indicator-list.css: { preprocess: false, minified: true }

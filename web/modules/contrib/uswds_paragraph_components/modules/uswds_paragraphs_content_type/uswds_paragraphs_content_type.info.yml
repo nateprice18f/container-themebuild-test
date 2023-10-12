@@ -1,0 +1,14 @@
+name: USWDS Paragraphs Content Type
+type: module
+description: A reusable Content type utilizing USWDS.
+core: 8.x
+core_version_requirement: ^8 || ^9
+package: Paragraphs
+dependencies:
+  - paragraphs:paragraphs
+  - uswds_paragraph_components:uswds_paragraph_components
+
+# Information added by Drupal.org packaging script on 2022-04-22
+version: '2.2.4'
+project: 'uswds_paragraph_components'
+datestamp: 1650646799

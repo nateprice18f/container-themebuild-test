@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Install functions for the uswds_ckeditor_integration module.
+ */
+
+use Drupal\Core\Config\FileStorage;
+use Symfony\Component\Yaml\Yaml;
+
+
+/**
+ * Reads in new configuration.
+ *
+ * @param string $config_name
+ *   Configuration name.
+ * @param string $path
+ *   Base path.
+ */
+function uswds_ckeditor_integration_read_in_new_config($config_name, $path) {
+  $active_storage = \Drupal::service('config.storage');
+  $active_storage->write($config_name, Yaml::parse(file_get_contents($path . '/config/optional/' . $config_name)));
+}
+
+/**
+ * Add the CKEditor USWDS Grid updated configuration.
+ */
+function uswds_ckeditor_integration_update_8201() {
+  // Load the entire installation file.
+  $config_path = \Drupal::service('extension.list.module')->getPath('uswds_ckeditor_integration') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write('uswds_ckeditor_integration.settings', $source->read('uswds_ckeditor_integration.settings'));
+
+  // Load editors with USWDS Grid enabled and add default options.
+  $editor_config = \Drupal::entityTypeManager()->getStorage('editor')->loadMultiple();
+  /** @var \Drupal\editor\EditorInterface $editor */
+  foreach ($editor_config as $editor) {
+    $settings = $editor->getSettings();
+    if (isset($settings['plugins']['uswds_grid'])) {
+
+      // All columns for BC.
+      $settings['plugins']['uswds_grid']['available_columns'] = [
+        1 => 1,
+        2 => 2,
+        3 => 3,
+        4 => 4,
+        5 => 5,
+        6 => 6,
+        7 => 7,
+        8 => 8,
+        9 => 9,
+        10 => 10,
+        11 => 11,
+        12 => 12,
+      ];
+
+      // Don't enable XXL by default as is new.
+      $settings['plugins']['uswds_grid']['available_breakpoints'] = [
+        'card' => 'card',
+        'card-lg' => 'card-lg',
+        'mobile' => 'mobile',
+        'mobile-lg' => 'mobile-lg',
+        'tablet' => 'tablet',
+        'tablet-lg' => 'tablet-lg',
+        'desktop' => 'desktop',
+        'desktop-lg' => 'desktop-lg',
+        'widescreen' => 0,
+      ];
+      $editor->setSettings($settings);
+      $editor->save();
+    }
+  }
+}
+
+/**
+ * New Ckeditor Template styles
+ */
+function uswds_ckeditor_integration_update_8202() {
+
+  $config_path = \Drupal::service('extension.path.resolver')->getPath('module', 'uswds_ckeditor_integration');
+  $files = [
+    'ckeditor_templates_ui.ckeditor_template.uswds_process_list.yml',
+  ];
+
+  $message = PHP_EOL;
+  foreach ($files as $file) {
+    uswds_ckeditor_integration_read_in_new_config($file, $config_path);
+    $message .= $file . ' imported ' . PHP_EOL;
+  }
+
+  return $message;
+}

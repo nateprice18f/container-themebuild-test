@@ -1,0 +1,29 @@
+/** Workarounds for themes that interfere with stepbystep styling. */
+#block-wfadmin-content #edit-steps {
+  display: block;
+}
+
+#block-wfadmin-content .button.stepbystep-details-reset {
+  float: right;
+}
+
+[dir="rtl"] #block-wfadmin-content .button.stepbystep-details-reset {
+  float: left;
+}
+
+#block-wfadmin-content .button.form-submit:not(.button--primary) {
+  background-color: #fff;
+  border: 1px #2b579a solid;
+  color: #2b579a;
+}
+
+#block-wfadmin-content .button.form-submit:not(.button--primary):hover {
+  background-color: #5c83be;
+  border: 1px solid #48a9e4;
+  color: #fff;
+  text-decoration: none;
+}
+
+#block-wfadmin-content #edit-actions {
+  display: block;
+}

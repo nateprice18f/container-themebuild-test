@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: uswds_paragraphs
+label: 'USWDS Paragraphs'
+revision: 1
+description: 'Basic block type with a paragraph field to USWDS bundles.'

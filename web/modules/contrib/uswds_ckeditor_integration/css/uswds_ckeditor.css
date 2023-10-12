@@ -1,0 +1,47 @@
+.grid-container {
+  margin-right: auto;
+  margin-left: auto;
+  padding: 10px 0;
+}
+
+.grid-container .grid-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+}
+
+.grid-container .grid-row div[class*=grid-col] {
+  display: inline-block;
+  flex: 1 1 0;
+  border: dashed 1px #1e88e5;
+  padding: 5px 10px;
+  width: auto;
+  min-width: 1px;
+  max-width: 100%;
+  box-sizing: border-box;
+  -ms-flex: 1 1 0;
+  -webkit-box-flex: 1;
+}
+
+.usa-summary-box {
+  position: relative;
+  border: 1px #99deea solid;
+  border-radius: 0.25rem;
+  background-color: #e7f6f8;
+  padding: 1.5rem;
+  line-height: 1.5;
+  color: #1b1b1b;
+}
+
+.usa-summary-box .usa-summary-box__body {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.usa-summary-box .usa-summary-box__heading {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.1;
+}

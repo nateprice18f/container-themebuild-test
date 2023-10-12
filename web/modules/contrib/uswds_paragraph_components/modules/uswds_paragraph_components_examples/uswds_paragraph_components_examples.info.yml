@@ -1,0 +1,13 @@
+name: USWDS Paragraph Components Examples
+type: module
+description: Example content for USWDS Paragraph Components.
+core_version_requirement: ^8 || ^9
+package: Paragraphs
+dependencies:
+  - paragraphs:paragraphs
+  - uswds_paragraph_components:uswds_paragraphs_content_type
+
+# Information added by Drupal.org packaging script on 2022-04-22
+version: '2.2.4'
+project: 'uswds_paragraph_components'
+datestamp: 1650646799

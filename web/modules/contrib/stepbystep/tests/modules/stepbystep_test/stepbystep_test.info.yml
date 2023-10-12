@@ -1,0 +1,12 @@
+name: 'Step by Step test'
+type: module
+description: 'Test module for Step by Step.'
+package: Testing
+core_version_requirement: ^8 || ^9
+dependencies:
+  - stepbystep:stepbystep
+
+# Information added by Drupal.org packaging script on 2022-06-06
+version: '2.0.0'
+project: 'stepbystep'
+datestamp: 1654538830

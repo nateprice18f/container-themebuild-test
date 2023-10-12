@@ -1,0 +1,937 @@
+<?php
+
+/**
+ * @file
+ * Install, uninstall and update hooks for USWDS Paragraph Components module.
+ * @noinspection ALL
+ */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Config\FileStorage;
+use Symfony\Component\Yaml\Yaml;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\paragraphs\Entity\Paragraph;
+
+/**
+ * Implements hook_install().
+ */
+function uswds_paragraph_components_install() {
+  $vid = 'uswds_breakpoints';
+  $name = 'widescreen';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'widescreen',
+      'vid' => $vid,
+      'weight' => 1,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'desktop-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'desktop-lg',
+      'vid' => $vid,
+      'weight' => 2,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'desktop';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'desktop',
+      'vid' => $vid,
+      'weight' => 3,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'tablet-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'tablet-lg',
+      'vid' => $vid,
+      'weight' => 4,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'tablet';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'tablet',
+      'vid' => $vid,
+      'weight' => 5,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'mobile-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'mobile-lg',
+      'vid' => $vid,
+      'weight' => 6,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'mobile';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'mobile',
+      'vid' => $vid,
+      'weight' => 7,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'card-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'card-lg',
+      'vid' => $vid,
+      'weight' => 8,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'card';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'card',
+      'vid' => $vid,
+      'weight' => 9,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+}
+
+/**
+ * Reads in new configuration.
+ *
+ * @param string $config_name
+ *   Configuration name.
+ * @param string $path
+ *   Base path.
+ */
+function uswds_paragraph_components_read_in_new_config($config_name, $path) {
+  $active_storage = \Drupal::service('config.storage');
+  $active_storage->write($config_name, Yaml::parse(file_get_contents($path . '/config/optional/' . $config_name . '.yml')));
+}
+
+/**
+ * Given a list of config files update
+ *
+ * @param $config_list
+ */
+function uswds_paragraph_components_update_existing_confiug($config_list) {
+  // Sets variable for the path.
+  $config_path = drupal_get_path('module', 'uswds_paragraph_components') . '/config/optional';
+
+  $updated = [];
+  $created = [];
+  $config_manger = \Drupal::service('config.manager');
+  foreach ($config_list as $file) {
+    $raw = file_get_contents($config_path . '/' . $file);
+    $value = \Drupal\Component\Serialization\Yaml::decode($raw);
+    if (!is_array($value)) {
+      throw new \RuntimeException(sprintf('Invalid YAML file %s'), $file);
+    }
+    // Lazy hack here since that code ignores the file extension.
+    $type = $config_manger->getEntityTypeIdByName(basename($file));
+    $entity_manager = $config_manger->getEntityTypeManager();
+    $definition = $entity_manager->getDefinition($type);
+    $id_key = $definition->getKey('id');
+    $id = $value[$id_key];
+    $entity_storage = $entity_manager->getStorage($type);
+    $entity = $entity_storage->load($id);
+    if ($entity) {
+      $entity = $entity_storage->updateFromStorageRecord($entity, $value);
+      $entity->save();
+      $updated[] = $id;
+    }
+    else {
+      $entity = $entity_storage->createFromStorageRecord($value);
+      $entity->save();
+      $created[] = $id;
+    }
+  }
+  return [
+    'updated' => $updated,
+    'created' => $created,
+  ];
+}
+
+/**
+ * Applying the update hook from bootstrap_layout_builder 3211104-21.patch.
+ */
+function uswds_paragraph_components_update_8101() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create field storage.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_make_card_link.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+  // Create field instance.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_cards_flag.field_make_card_link.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_card_regular.field_make_card_link.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_regular.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_card_regular.default', $path);
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_cards_flag.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_cards_flag.default', $path);
+
+  // Send message to updater.
+  return t('Make Card Link field successfully added to USWDS Paragraph Card and USWDS Paragraph Flag.');
+}
+
+/**
+ * Fix issue on 3215534.
+ */
+function uswds_paragraph_components_update_8102() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create field storage.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_number_of_columns.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+  // Create field instance.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_card_regular.field_number_of_columns.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_cards_flag.field_number_of_columns.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_regular.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_card_regular.default', $path);
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_cards_flag.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_cards_flag.default', $path);
+
+  // Send message to updater.
+  return t('Number of Columns field successfully added to USWDS Paragraph Card and USWDS Paragraph Flag.');
+}
+
+/**
+ * Fix issue on 3215640.
+ */
+function uswds_paragraph_components_update_8103() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create Taxonomy Vocab.
+  uswds_paragraph_components_read_in_new_config('taxonomy.vocabulary.uswds_classes', $path);
+
+  // Create field storage.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_uswds_classes.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+  // Create field instance.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_card_group_regular.field_uswds_classes.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_card_group_flag.field_uswds_classes.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_group_flag.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_card_group_flag.default', $path);
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_group_regular.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_card_group_regular.default', $path);
+
+  // Send message to updater.
+  return t('Number of Columns field successfully added to USWDS Paragraph Card and USWDS Paragraph Flag.');
+}
+
+/**
+ * Fix issue on 3215673.
+ */
+function uswds_paragraph_components_update_8104() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Update labels.
+  uswds_paragraph_components_read_in_new_config('field.field.paragraph.uswds_card_regular.field_extend_media', $path);
+  uswds_paragraph_components_read_in_new_config('field.field.paragraph.uswds_card_regular.field_indent_media', $path);
+  uswds_paragraph_components_read_in_new_config('field.field.paragraph.uswds_card_regular.field_title_first', $path);
+
+  // Send message to updater.
+  return t('Card labels successfully updated.');
+}
+
+/**
+ * Fix issue on 3215673.
+ */
+function uswds_paragraph_components_update_8105() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Enable Field Group.
+  \Drupal::service('module_installer')->install(['field_group']);
+
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_regular.default', $path);
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_cards_flag.default', $path);
+
+  // Send message to updater.
+  return t('Cards Node Forms successfully updated.');
+}
+
+/**
+ * Fix issue on 3215673.
+ */
+function uswds_paragraph_components_update_8106() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_step_indicator_item.default', $path);
+
+  // Send message to updater.
+  return t('Fix issue with step indicator item.');
+}
+
+/**
+ * Fix issue on 3216317.
+ */
+function uswds_paragraph_components_update_8107() {
+  // Enable Field Group.
+  \Drupal::service('module_installer')->install(['twig_tweak']);
+}
+
+/**
+ * Fix issue on 3219731.
+ */
+function uswds_paragraph_components_update_8108() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_cards_flag.default', $path);
+
+  // Send message to updater.
+  return t('Update Flag Display settings');
+}
+
+/**
+ * Fix issue on 3219731.
+ */
+function uswds_paragraph_components_update_8109() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create field storage.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_alternating_flags.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+  // Create field instance.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_card_group_flag.field_alternating_flags.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_group_flag.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_card_group_flag.default', $path);
+
+  // Send message to updater.
+  return t('Make alternating field. Update flag group paragraph type.');
+}
+
+/**
+ * BE VERY CAREFUL!!  Redoing the paragraph columns for ticket 3223490.
+ */
+function uswds_paragraph_components_update_8110() {
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+  $config_path = drupal_get_path('module', 'uswds_paragraph_components') . '/config/optional';
+
+  $module_handler = \Drupal::moduleHandler();
+  $config_storage = new FileStorage($module_handler->getModule('uswds_paragraph_components')->getPath() . '/config/optional');
+
+  if (is_dir($config_path)) {
+    $files = scandir($config_path);
+    foreach (array_reverse($files) as $file) {
+
+      if (pathinfo($file, PATHINFO_EXTENSION) == 'yml' &&
+        (str_contains($file, 'breakpoint') || str_contains($file, 'column') ||
+          str_contains($file, 'grid') || str_contains($file, 'views.view.uswds_entity_references')) &&
+        !str_contains($file, 'field_number_of_columns')) {
+        if (str_contains($file, 'field.')) {
+          $fileName = str_replace('.yml', '', $file);
+          $config_record = $config_storage->read($fileName);
+          $entity_type = \Drupal::service('config.manager')
+            ->getEntityTypeIdByName($file);
+          $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+          $entity = $storage->createFromStorageRecord($config_record);
+          if (is_object($entity)) {
+            $entity->save();
+          }
+        }
+        else {
+          // Remove file extension.
+          $fileName = str_replace('.yml', '', $file);
+          uswds_paragraph_components_read_in_new_config($fileName, $path);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Creating breakpoint terms from ticket: 3223490.
+ */
+function uswds_paragraph_components_update_8111() {
+
+  $vid = 'uswds_breakpoints';
+  $name = 'widescreen';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'widescreen',
+      'vid' => $vid,
+      'weight' => 1,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'desktop-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'desktop-lg',
+      'vid' => $vid,
+      'weight' => 2,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'desktop';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'desktop',
+      'vid' => $vid,
+      'weight' => 3,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'tablet-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'tablet-lg',
+      'vid' => $vid,
+      'weight' => 4,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'tablet';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'tablet',
+      'vid' => $vid,
+      'weight' => 5,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'mobile-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'mobile-lg',
+      'vid' => $vid,
+      'weight' => 6,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'mobile';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'mobile',
+      'vid' => $vid,
+      'weight' => 7,
+      'status' => 1,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'card-lg';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'card-lg',
+      'vid' => $vid,
+      'weight' => 8,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+
+  $name = 'card';
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_vocabulary')
+    ->loadByProperties([$name, $vid]);
+  if (empty($terms)) {
+    $new_term = Term::create([
+      'name' => 'card',
+      'vid' => $vid,
+      'weight' => 9,
+      'status' => 0,
+    ]);
+    $new_term->save();
+  }
+}
+
+/**
+ * BE VERY CAREFUL!! Adding icons for bundles 3223487.
+ */
+function uswds_paragraph_components_update_8112() {
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Update Paragraph Bundles.
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.text_field', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_2_column_breakpoints', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_2_columns', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_3_column_breakpoints', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_3_columns', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_accordion', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_accordion_section', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_alert', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_card_group_flag', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_card_group_regular', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_card_regular', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_cards_flag', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_process_item', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_process_list', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_step_indicator_item', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_step_indicator_list', $path);
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_summary_box', $path);
+
+  // Send message to updater.
+  return t('Update Paragraph Bundle Icons.');
+}
+
+/**
+ * Addresses issue for 3215505.
+ */
+function uswds_paragraph_components_update_8113() {
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_card_regular.default', $path);
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_cards_flag.default', $path);
+
+  return t('Update Paragraph Card bundle media widget.');
+}
+
+/**
+ * Addresses issue for 3226122.
+ */
+function uswds_paragraph_components_update_8114() {
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+  $config_path = drupal_get_path('module', 'uswds_paragraph_components') . '/config/optional';
+
+  $module_handler = \Drupal::moduleHandler();
+  $config_storage = new FileStorage($module_handler->getModule('uswds_paragraph_components')->getPath() . '/config/optional');
+
+  if (is_dir($config_path)) {
+    $files = scandir($config_path);
+    foreach (array_reverse($files) as $file) {
+
+      if (pathinfo($file, PATHINFO_EXTENSION) == 'yml' &&
+        (str_contains($file, 'breakpoint') || str_contains($file, 'card'))) {
+        if (str_contains($file, 'field.')) {
+          $fileName = str_replace('.yml', '', $file);
+          $config_record = $config_storage->read($fileName);
+          $entity_type = \Drupal::service('config.manager')
+            ->getEntityTypeIdByName($file);
+          $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+          $entity = $storage->createFromStorageRecord($config_record);
+          try {
+            if (is_object($entity)) {
+              $entity->save();
+            }
+          }
+          catch (Exception $e) {
+            // Continue.
+          }
+
+        }
+        else {
+          // Remove file extension.
+          $fileName = str_replace('.yml', '', $file);
+          uswds_paragraph_components_read_in_new_config($fileName, $path);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Addresses issue for 3226172.
+ */
+function uswds_paragraph_components_update_8115() {
+
+  $types = ['uswds_cards_flag', 'uswds_card_regular'];
+  $storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+  $query = \Drupal::entityQuery('paragraph')
+    ->condition('type', $types, 'IN');
+  $nids = $query->execute();
+  $paragraphs = $storage->loadMultiple($nids);
+  foreach ($paragraphs as $p) {
+    $number = $p->get("field_number_of_columns")->value;
+    if ($number) {
+      $paragraph = Paragraph::load($p->id());
+      $taxonomyStorage = \Drupal::service('entity_type.manager')
+        ->getStorage('taxonomy_term');
+      $properties['vid'] = 'uswds_breakpoints';
+
+      // Set name properties.
+      $properties['name'] = 'tablet';
+
+      // Load taxonomy term by properties.
+      $terms = $taxonomyStorage->loadByProperties($properties);
+      $tablet = reset($terms);
+
+      $breakpoint = Paragraph::create([
+        'type' => 'uswds_card_breakpoints',
+        'field_number_of_columns' => [
+          "value" => $number,
+        ],
+        'field_uswds_breakpoints' => [
+          "target_id" => $tablet->id(),
+        ],
+      ]);
+      $breakpoint->save();
+
+      $paragraph->field_card_breakpoints->target_id = $breakpoint->id();
+      $paragraph->field_card_breakpoints->target_revision_id = $breakpoint->getRevisionId();
+
+      $paragraph->save();
+    }
+  }
+}
+
+/**
+ * Fix issue on 3225140.
+ */
+function uswds_paragraph_components_update_8116() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create Paragraphs bundle.
+  uswds_paragraph_components_read_in_new_config('paragraphs.paragraphs_type.uswds_modal', $path);
+
+  // Create field storage for new fields.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_modal_yes_button_text.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_modal_title.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_modal_no_button_text.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_modal_body.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_large_modal.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_force_action.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_button_text.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  // Create field instance for new fields.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_modal_yes_button_text.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_modal_title.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_modal_no_button_text.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_modal_body.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_large_modal.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_force_action.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_button_text.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_modal.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_modal.default', $path);
+
+  // Send message to updater.
+  return t('Created USWDS Modal paragraph bundle.');
+}
+
+/**
+ * Fix issue on 3230258.
+ */
+function uswds_paragraph_components_update_8117() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create field storage for new fields.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_display_as_button.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  // Create field instance for new fields.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_modal.field_display_as_button.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_modal.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_modal.default', $path);
+
+  // Send message to updater.
+  return t('Updated USWDS Modal paragraph bundle.');
+}
+
+/**
+ * Fix issue on 3239115.
+ */
+function uswds_paragraph_components_update_8118() {
+
+  // Sets variable for the path.
+  $path = drupal_get_path('module', 'uswds_paragraph_components');
+
+  // Create field storage for new fields.
+  $field_storage_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.storage.paragraph.field_default_open.yml'));
+  if (!FieldStorageConfig::loadByName($field_storage_yml['entity_type'], $field_storage_yml['field_name'])) {
+    FieldStorageConfig::create($field_storage_yml)->save();
+  }
+
+  // Create field instance for new fields.
+  $field_yml = Yaml::parse(file_get_contents($path . '/config/optional/field.field.paragraph.uswds_accordion.field_default_open.yml'));
+  if (!FieldConfig::loadByName($field_yml['entity_type'], $field_yml['bundle'], $field_yml['field_name'])) {
+    FieldConfig::create($field_yml)->save();
+  }
+
+  // Create Paragraphs bundle form.
+  uswds_paragraph_components_read_in_new_config('core.entity_form_display.paragraph.uswds_accordion.default', $path);
+  // Create Paragraphs bundle view.
+  uswds_paragraph_components_read_in_new_config('core.entity_view_display.paragraph.uswds_accordion.default', $path);
+
+  // Send message to updater.
+  return t('Updated USWDS Accordion paragraph bundle.');
+}
+
+/**
+ * Fix issue on 3247519.
+ */
+function uswds_paragraph_components_update_8119() {
+  $files = [
+    'core.entity_form_display.paragraph.uswds_card_group_flag.default.yml',
+    'core.entity_form_display.paragraph.uswds_card_group_regular.default.yml',
+    'core.entity_form_display.paragraph.uswds_card_regular.default.yml',
+    'core.entity_form_display.paragraph.uswds_cards_flag.default.yml',
+  ];
+  uswds_paragraph_components_update_existing_confiug($files);
+  // Send message to updater.
+  return t('Updated USWDS Card paragraph form bundle.');
+}
+
+/**
+ * Fix issue on 3247519 Update regular & flag card form widgets for breakpoints.
+ */
+function uswds_paragraph_components_update_8120() {
+  $files = [
+    'core.entity_form_display.paragraph.uswds_2_columns.default.yml',
+    'core.entity_form_display.paragraph.uswds_3_columns.default.yml',
+    'core.entity_form_display.paragraph.uswds_card_regular.default.yml',
+    'core.entity_form_display.paragraph.uswds_cards_flag.default.yml',
+  ];
+  uswds_paragraph_components_update_existing_confiug($files);
+
+  // Send message to updater.
+  return t('Updated USWDS Card paragraph form bundle.');
+}
+
+/**
+ * Fix issue on 3247964 Field groups to be open.
+ */
+function uswds_paragraph_components_update_8121() {
+  $files = [
+    'core.entity_form_display.paragraph.uswds_2_columns.default.yml',
+    'core.entity_form_display.paragraph.uswds_3_columns.default.yml',
+    'core.entity_form_display.paragraph.uswds_card_regular.default.yml',
+    'core.entity_form_display.paragraph.uswds_cards_flag.default.yml',
+  ];
+  uswds_paragraph_components_update_existing_confiug($files);
+  // Send message to updater.
+  return t('Updated USWDS Card paragraph form bundle.');
+}
+
+/**
+ * Fix issue on 3247504 Update help text.
+ */
+function uswds_paragraph_components_update_8122() {
+    $files = [
+      'field.field.paragraph.uswds_2_column_breakpoints.field_2_column_grid_options.yml',
+      'field.field.paragraph.uswds_2_column_breakpoints.field_uswds_breakpoints.yml',
+      'field.field.paragraph.uswds_2_columns.field_uswds_2_column_breakpoints.yml',
+      'field.field.paragraph.uswds_3_column_breakpoints.field_uswds_breakpoints.yml',
+      'field.field.paragraph.uswds_3_columns.field_uswds_3_column_breakpoints.yml',
+      'field.field.paragraph.uswds_accordion.field_bordered.yml',
+      'field.field.paragraph.uswds_accordion.field_multiselect.yml',
+      'field.field.paragraph.uswds_card_breakpoints.field_uswds_breakpoints.yml',
+      'paragraphs.paragraphs_type.uswds_2_column_breakpoints.yml',
+      'paragraphs.paragraphs_type.uswds_3_column_breakpoints.yml',
+      'paragraphs.paragraphs_type.uswds_card_breakpoints.yml',
+    ];
+    uswds_paragraph_components_update_existing_confiug($files);
+}

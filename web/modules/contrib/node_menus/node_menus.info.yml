@@ -1,0 +1,15 @@
+name: Node Menus
+description: "Allow selecting menus that are available for nodes."
+core_version_requirement: ^8 | ^9
+type: module
+
+dependencies:
+  - content_translation
+  - menu_ui
+  - node
+  - language
+
+# Information added by Drupal.org packaging script on 2020-08-23
+version: '3.0.0-alpha1'
+project: 'node_menus'
+datestamp: 1598165816

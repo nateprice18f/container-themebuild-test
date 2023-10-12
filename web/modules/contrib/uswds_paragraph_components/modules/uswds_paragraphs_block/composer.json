@@ -1,0 +1,20 @@
+{
+    "name": "drupal/uswds_paragraphs_block",
+    "description": "A reusable Paragraph Block type using USWDS.",
+    "type": "drupal-module",
+    "homepage": "https://drupal.org/project/uswds_paragraph_components",
+    "require": {
+        "drupal/uswds_paragraph_components": "*"
+    },
+    "support": {
+        "issues": "https://drupal.org/project/issues/uswds_paragraph_components",
+        "source": "https://git.drupalcode.org/project/uswds_paragraph_components"
+    },
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Stephen Mustgrave",
+            "email": "smustgrave@gmail.com"
+        }
+    ]
+}
