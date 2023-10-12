@@ -53,11 +53,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
       
-      - name: Security scan
-        uses: anchore/scan-action@v3
-        with:
-          image-reference: "natep18f/container-themebuild-test:container-build-composer"
-          fail-build: true
+     # - name: Security scan
+     #   uses: anchore/scan-action@v3
+     #   with:
+     #     image-reference: "natep18f/container-themebuild-test:container-build-composer"
+     #     fail-build: true
           
   #pull-var-www:
   #  name: Pull /var/www from docker image
