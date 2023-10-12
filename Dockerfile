@@ -5,6 +5,8 @@ ARG BGID=1000
 ARG BUILD_ENV
 ENV BUILD_ENV ${BUILD_ENV:-none}
 
+WORKDIR /var/www
+
 COPY --chown=www-data:www-data composer.json /var/www/composer.json
 COPY --chown=www-data:www-data composer.lock /var/www/composer.lock
 COPY --chown=www-data:www-data patches /var/www/patches
@@ -53,4 +55,4 @@ RUN composer -n config --global allow-plugins true \
     && $COMPOSER_DIR/vendor/bin/phpcs --config-set installed_paths $COMPOSER_DIR/vendor/drupal/coder/coder_sniffer,$COMPOSER_DIR/vendor/sirbrillig/phpcs-variable-analysis,$COMPOSER_DIR/vendor/slevomat/coding-standard
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --ignore-platform-reqs --no-interaction --optimize-autoloader \
     && chown www-data:www-data /var/www/composer.json /var/www/composer.lock
-WORKDIR /var/www
+
