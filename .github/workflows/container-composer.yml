@@ -59,15 +59,15 @@ jobs:
      #     image-reference: "natep18f/container-themebuild-test:container-build-composer"
      #     fail-build: true
           
-  #pull-var-www:
-  #  name: Pull /var/www from docker image
-  #  needs: compose
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #     - name: Pull image
-  #       run: docker pull natep18f/container-themebuild-test:container-build-composer
-  #     - name: Pull folder from docker image
-  #       run: docker run --rm -v ${{ github.workspace }}:/var/www ontainer-themebuild-test:container-build-composer cp -r /var/www 
+  pull-var-www:
+    name: Pull /var/www from docker image
+    needs: compose
+    runs-on: ubuntu-latest
+    steps:
+       - name: Pull image
+         run: docker pull natep18f/container-themebuild-test:container-build-composer
+       - name: Pull folder from docker image
+         run: docker run --rm -v ${{ github.workspace }}:/var/www ontainer-themebuild-test:container-build-composer cp -r /var/www 
      
      # - name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
@@ -75,9 +75,9 @@ jobs:
       
   build-theme:
     name: Builds themebuilder packages
-    #needs: pull-var-www
-    needs: compose
-    runs-on: natep18f/container-themebuild-test:container-build-composer
+    needs: pull-var-www
+    #needs: compose
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
