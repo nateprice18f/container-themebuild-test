@@ -2,9 +2,9 @@ name: Builds Cypress Container with custom packages
 
 on:
   push:
-    branches: [ container-theme ]
+    branches: [ container-theme1 ]
   pull_request:
-    branches: [ container-theme ]
+    branches: [ container-theme1 ]
 
 jobs:
   build:
@@ -46,10 +46,19 @@ jobs:
       - name: Build and push image to Docker Hub
         uses: docker/build-push-action@v4
         with:
+          context: .
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64 #, linux/arm64
+          outputs: type=oci,dest=/tmp/www.tar
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: www
+          path: /tmp/www.tar
           
       - name: Security scan
         uses: anchore/scan-action@v3
