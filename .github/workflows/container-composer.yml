@@ -61,12 +61,15 @@ jobs:
         #run: docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/
         run: docker pull natep18f/container-themebuild-test:container-build-composer
         
+      - name: Make DIR
+        run: mkdir /tmp/www
+      
       - name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
-        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www /www
+        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www /tmp/www
 
       - name: Compress www folder
-        run:  zip -r www.zip . -i /www
+        run:  zip -r www.zip . -i /tmp/www
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
