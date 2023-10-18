@@ -1,8 +1,7 @@
-FROM node:19.9-bullseye-slim
+FROM node:19.9-bullseye-slim AS theme-builder
 
 ARG BUID=1000
 ARG BGID=1000
-
 
 RUN sed -E -i "s/:x:${BUID}:/:x:1919:/g" /etc/passwd \
     && sed -E -i "s/:x:([0-9]+):${BGID}:/:x:\1:1919:/g" /etc/passwd \
@@ -16,8 +15,8 @@ RUN npm install --global \
 
 COPY --chown=node:node web/themes/custom/ /var/www/web/themes/custom/
 COPY --chown=node:node web/libraries/ /var/www/web/libraries/
-COPY --chown=node:node /var/www/web/themes/ /var/www/web/themes/
-COPY --chown=node:node /var/www/web/libraries/ /var/www/web/libraries/
+COPY --chown=node:node --from=composer-builder /var/www/web/themes/ /var/www/web/themes/
+COPY --chown=node:node --from=composer-builder /var/www/web/libraries/ /var/www/web/libraries/
 
 WORKDIR /var/www/web/themes/custom/usagov
 
