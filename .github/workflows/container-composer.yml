@@ -2,9 +2,9 @@ name: Builds Cypress Container with custom packages
 
 on:
   push:
-    branches: [ container-theme ]
+    branches: [ container-themebuild ]
   pull_request:
-    branches: [ container-theme ]
+    branches: [ container-themebuild ]
 
 jobs:
   build:
