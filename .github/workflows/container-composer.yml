@@ -2,9 +2,9 @@ name: Creates Composer Container from upstream
 
 on:
   push:
-    branches: [ contiainer-theme ]
+    branches: [ contiainer-theme1 ]
   pull_request:
-    branches: [ contiainer-theme ]
+    branches: [ contiainer-theme1 ]
 
 jobs:
   compose:
