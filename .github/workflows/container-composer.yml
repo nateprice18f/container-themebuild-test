@@ -65,14 +65,17 @@ jobs:
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
         run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www www
 
-      - name: Compress www folder
-        run:  zip -r www.zip . -i www
+     # - name: Compress www folder
+     #   run:  zip -r www.zip . -i www
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
+        #with:
+          #name: www
+          #path: www.zip
         with:
           name: www
-          path: www.zip
+          path: ${{ github.workspace }}/var/www
           
   build-theme:
     needs: compose
@@ -91,11 +94,11 @@ jobs:
       - name: unzip artifact for deployment
         run: unzip www.zip -d /temp/www
         
-      #- name: Download artifact
-      #  uses: actions/download-artifact@v2
-      #  with:
-      #    name: www
-      #    path: ${{ github.workspace }}/var/www
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: www
+          path: ${{ github.workspace }}/var/www
         
       - name: Generate Docker metadata
         id: meta
