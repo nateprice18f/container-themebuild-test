@@ -63,10 +63,10 @@ jobs:
         
       - name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
-        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www www
+        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www /www
 
       - name: Compress www folder
-        run:  zip www.zip /www -r
+        run:  zip -r www.zip . -i /www
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
