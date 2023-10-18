@@ -92,7 +92,7 @@ jobs:
           name: www
           
       - name: unzip artifact for deployment
-        run: unzip release.zip -d /temp/www
+        run: unzip www.zip -d /temp/www
         
       #- name: Download artifact
       #  uses: actions/download-artifact@v2
