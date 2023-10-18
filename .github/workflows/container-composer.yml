@@ -2,9 +2,9 @@ name: Creates Composer Container from upstream
 
 on:
   push:
-    branches: [ container-build-composer ]
+    branches: [ container-build-composer1 ]
   pull_request:
-    branches: [ container-build-composer ]
+    branches: [ container-build-composer1 ]
 
 jobs:
   compose:
@@ -65,11 +65,14 @@ jobs:
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/image:latest):/workdir www
         run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www www
 
+      - name: Compress www folder
+        run:  zip www.zip /www -r
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: www
-          path: www
+          path: www.zip
           
   build-theme:
     needs: compose
@@ -80,11 +83,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Download artifact
-        uses: actions/download-artifact@v2
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
         with:
           name: www
-          path: ${{ github.workspace }}/var/www
+          path: www.zip
+        
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v2
+      #  with:
+      #    name: www
+      #    path: ${{ github.workspace }}/var/www
         
       - name: Generate Docker metadata
         id: meta
