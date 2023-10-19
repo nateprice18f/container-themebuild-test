@@ -50,9 +50,16 @@ jobs:
         with:
           name: theme
           path: theme.tar
+          
       - name: 'Echo download path'
         run: echo ${{steps.theme.outputs.download-path}}
 
+      - name: mf
+        run: mkdir theme
+        
+      - name: Tar files
+        run: tar -tvf theme.tar theme
+        
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
