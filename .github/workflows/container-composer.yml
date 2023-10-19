@@ -48,6 +48,7 @@ jobs:
 
   artifact-build:
       name: Creates artifact
+      needs: compose
       runs-on: ubuntu-latest
       steps:
       - name: Pull Image
