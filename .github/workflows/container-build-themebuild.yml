@@ -8,40 +8,11 @@ on:
 
 jobs:
   compose:
-    name: Compose build
+    name: Compose Container
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Download artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: www
-          path: ${{ github.workspace }}/var/www
-        
-      - name: Generate Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            natep18f/container-themebuild-test
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{major}}.{{minor}}
-          flavor: |
-            latest=false
-
-      #- name: Lint Dockerfile
-      #  uses: hadolint/hadolint-action@v3.1.0
-      #  with:
-      #    dockerfile: Dockerfile
-  
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-
-      - name: Setup Docker Buildx 
-        uses: docker/setup-buildx-action@v2.5.0
         
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -49,20 +20,21 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
-      - name: Build and push image to Docker Hub
-        uses: docker/build-push-action@v4
+      - name: Pull Image
+        run: docker pull natep18f/container-themebuild-test:container-build-composer
+        
+      - name: Copy workdir
+        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www theme
+
+      - name: Tar files
+        run: tar -cvf theme.tar theme
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64, linux/arm64
-          
-      #- name: Security scan
-      #  uses: anchore/scan-action@v3
-      #  with:
-      #    image-reference: "ubuntu:latest"
-      #    fail-build: true
-          
+          name: theme
+          path: theme.tar
+  
   build-theme:
     needs: compose
     name: Builds themebuilder packages
@@ -75,9 +47,8 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: www
-          path: ${{ github.workspace }}/var/www
-        
+          name: theme
+                  
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -89,11 +60,6 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
           flavor: |
             latest=false
-
-      #- name: Lint Dockerfile
-      #  uses: hadolint/hadolint-action@v3.1.0
-      #  with:
-      #    dockerfile: Dockerfile
   
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
@@ -114,9 +80,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
-          
-      - name: Security scan
-        uses: anchore/scan-action@v3
-        with:
-          image-reference: "ubuntu:latest"
-          fail-build: true
+
