@@ -46,6 +46,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
 
+  artifact-build:
+      name: Creates artifact
+      runs-on: ubuntu-latest
+      steps:
       - name: Pull Image
         #run: docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/
         run: docker pull natep18f/container-themebuild-test:container-build-composer
@@ -59,11 +63,10 @@ jobs:
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
-        with:
-          name: www
-          path: www.zip
         #with:
         #  name: www
-        # path: ${{ github.workspace }}/var/www/
-          
+        #  path: www.zip
+        with:
+          name: www
+          path: ${{ github.workspace }}/var/www/
  
