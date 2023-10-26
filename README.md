@@ -1,7 +1,7 @@
 # Web Theme Themebuild Test Containers
 
 > **Warning**
-> The work done within this repo is proof of concept and should be used as a starting point for future work.
+> The work done within this repo are proof of concept and should be used as a starting point for future work.
 
 ## Themebuild Containers
 
