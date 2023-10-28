@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: theme
-          path: theme/
+          path: theme.tar
   
   build-theme:
     needs: compose
@@ -49,7 +49,7 @@ jobs:
         id: theme
         with:
           name: theme
-          path: ./theme
+          path: theme.tar
           
       - name: 'Echo download path'
         run: echo ${{steps.theme.outputs.download-path}} -l
