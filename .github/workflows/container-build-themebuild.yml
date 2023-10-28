@@ -24,7 +24,7 @@ jobs:
         run: docker run natep18f/container-themebuild-test:container-build-composer
         
       - name: Copy workdir
-        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www theme
+        run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
 
       - name: Tar files
         run: tar -cvf theme.tar theme
