@@ -20,14 +20,14 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
-      - name: Pull Image
-        run: docker pull natep18f/container-themebuild-test:container-build-composer
+      - name: Run Image
+        run: docker run natep18f/container-themebuild-test:container-build-composer
         
       - name: Copy workdir
         run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www theme
 
-      #- name: Tar files
-      #  run: tar -cvf theme.tar theme
+      - name: Tar files
+        run: tar -cvf theme.tar theme
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
