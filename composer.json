@@ -16,7 +16,6 @@
     ],
     "require": {
         "composer/installers": "^1.9",
-        "cweagans/composer-patches": "^1.7",
         "drupal/address": "^1.9",
         "drupal/admin_content_notification": "^3.8",
         "drupal/admin_toolbar": "3.x-dev",
@@ -105,8 +104,7 @@
             "drupal/core-composer-scaffold": true,
             "drupal/core-project-message": true,
             "wikimedia/composer-merge-plugin": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "cweagans/composer-patches": true
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "extra": {
