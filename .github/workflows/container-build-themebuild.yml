@@ -28,7 +28,7 @@ jobs:
           cd compose
           pwd
           
-      - name: Workspace data
+      - name: Workspace data pre
         run: |
             echo ${{ github.workspace }}
             echo $GITHUB_WORKSPACE
@@ -43,6 +43,11 @@ jobs:
           name: compose
           path: compose.tar
 
+      - name: Workspace data post
+        run: |
+            echo ${{ github.workspace }}
+            echo $GITHUB_WORKSPACE
+            
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
