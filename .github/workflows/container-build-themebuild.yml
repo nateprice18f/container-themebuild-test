@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       
       - name: Run Image
-        run: docker run -d --name composer natep18f/container-themebuild-test:container-build-composer
+        run: docker run natep18f/container-themebuild-test:container-build-composer --name composer 
 
       - name: Extract file from Docker container
         id: extract-file
