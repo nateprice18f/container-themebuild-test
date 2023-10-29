@@ -33,7 +33,7 @@ jobs:
             echo ${{ github.workspace }}
             echo $GITHUB_WORKSPACE
             echo ${{ runner.workspace }}
-            echo $RUNNER_WORKSPACE"
+            echo $RUNNER_WORKSPACE
             
       - name: Tar compose files
         run: |
