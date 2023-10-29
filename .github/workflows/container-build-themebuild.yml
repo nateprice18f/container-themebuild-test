@@ -24,7 +24,7 @@ jobs:
        run: docker exec composer zip -r release.zip /theme
 
      - name: Copy zip from container to host
-       run: docker cp composer:/theme/release.zip
+       run: docker cp composer:/theme/release.zip .
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
