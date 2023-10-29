@@ -2,9 +2,9 @@ name: Run Composer Container, saves themes and library to artifacts then builds 
 
 on:
   push:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
   pull_request:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
 
 jobs:
   compose:
