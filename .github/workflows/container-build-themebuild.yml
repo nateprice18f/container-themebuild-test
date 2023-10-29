@@ -2,9 +2,9 @@ name: Run Composer Container, saves themes and library to artifacts then builds 
 
 on:
   push:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
   pull_request:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
 
 jobs:
   compose:
@@ -27,7 +27,7 @@ jobs:
         id: extract-file
         run: |
           mkdir theme
-          docker cp composer:/var/www/web/themes theme
+          docker cp composer:/var/www/web/themes /theme
           ls theme
       #- name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
@@ -72,6 +72,7 @@ jobs:
         run: |
           mkdir app
           tar -xvf theme.tar -C app
+          
       #- name: Download artifact
       #  uses: actions/download-artifact@v3
       #  id: library
