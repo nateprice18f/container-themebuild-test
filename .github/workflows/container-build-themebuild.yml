@@ -32,9 +32,9 @@ jobs:
       #- name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
 
-      #- name: Tar theme files
-      #  run: |
-      #    tar -cvf theme.tar theme
+      - name: Tar theme files
+        run: |
+          tar -cvf theme.tar theme
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
