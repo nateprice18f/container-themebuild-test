@@ -19,14 +19,14 @@ jobs:
        
      - name: Copy files from container to host
        run: |
-        docker cp composer:/var/www .
+        docker cp composer:/var/www ${{ github.workspace }}
 
      - name: zip
        run: |
-         zip -r compose-theme.zip /var/www
+         zip -r compose-theme.zip ${{ github.workspace }}/*
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
        with:
          name: compose-theme
-         path: ./compose-theme.zip
+         path: compose-theme.zip
