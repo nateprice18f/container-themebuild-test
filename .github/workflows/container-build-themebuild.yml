@@ -15,17 +15,19 @@ jobs:
        uses: actions/checkout@3
 
      - name: Start Container image
-       run: docker run --name composer -d natep18f/container-themebuild-test:container-build-composer
+       run: docker run -d --name composer -v ${{ github.workspace }}:/theme natep18f/container-themebuild-test:container-build-composer
 
      - name: Copy Work Dir
-       run: |
-         mkdir -p /tmp/artifact
-         cp -r . /tmp/artifact
-         cd /tmp/artifact
-         zip -r artifact.zip .
+       run: docker cp . composer:/theme
+       
+     - name: Zip container folder
+       run: docker exec composer zip -r release.zip /theme
 
+     - name: Copy zip from container to host
+       run: docker cp composer:/theme/release.zip
+       
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
        with:
          name: artifact
-         path: /tmp/artifact/artifact.zip
+         path: release.zip
