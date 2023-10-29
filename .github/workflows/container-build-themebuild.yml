@@ -1,4 +1,4 @@
-name: Creates ThemeBuild Composer Container 
+name: Run Composer Container - Saves themes and library to artifacts 
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           docker cp composer:/var/www/web/themes theme
           cd theme
           ls
-          docker cp composer:/var/www/web/libraries library
+          docker cp composer:/var/www/web/libraries/ library
           docker rm composer
       #- name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
@@ -57,7 +57,7 @@ jobs:
           
   build-theme:
     needs: compose
-    name: Builds themebuilder packages
+    name: Uses artifacts to create theme-builder container
     runs-on: ubuntu-latest
     
     steps:
