@@ -2,9 +2,9 @@ name: Creates ThemeBuild Composer Container
 
 on:
   push:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
   pull_request:
-    branches: [ container-build-themebuild1 ]
+    branches: [ container-build-themebuild ]
 
 jobs:
   compose:
@@ -76,8 +76,10 @@ jobs:
           path: theme.tar
           
       - name: 'Echo download path'
-        run: echo ${{steps.theme.outputs.download-path}} -l
-        
+        run: |
+          echo ${{steps.theme.outputs.download-path}} -l
+          echo ${{steps.library.outputs.download-path}} -l
+          
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
