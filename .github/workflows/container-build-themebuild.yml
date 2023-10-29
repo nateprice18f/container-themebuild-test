@@ -72,6 +72,7 @@ jobs:
         run: |
           mkdir app
           tar -xvf theme.tar -C app
+          ls app
           
       #- name: Download artifact
       #  uses: actions/download-artifact@v3
