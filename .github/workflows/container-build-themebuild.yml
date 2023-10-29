@@ -25,7 +25,7 @@ jobs:
           mkdir compose
           docker run --name composer natep18f/container-themebuild-test:container-build-composer 
           docker cp composer:/var/www/web compose
-          ls compose
+          ls -r compose
 
       - name: Tar compose files
         run: |
