@@ -32,6 +32,8 @@ jobs:
         run: |
             echo ${{ github.workspace }}
             echo $GITHUB_WORKSPACE
+            echo ${{ runner.workspace }}
+            echo $RUNNER_WORKSPACE"
             
       - name: Tar compose files
         run: |
@@ -63,6 +65,8 @@ jobs:
         run: |
             echo ${{ github.workspace }}
             echo $GITHUB_WORKSPACE
+            echo ${{ runner.workspace }}
+            echo $RUNNER_WORKSPACE"
             
       - name: Generate Docker metadata
         id: meta
