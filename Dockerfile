@@ -14,8 +14,8 @@ RUN npm install --global \
       gulp \
     && chown -R node:node /home/node/
 
-COPY --chown=node:node web/themes/custom/ /var/www/web/themes/custom/
-COPY --chown=node:node web/libraries/ /var/www/web/libraries/
+#COPY --chown=node:node web/themes/custom/ /var/www/web/themes/custom/
+#COPY --chown=node:node web/libraries/ /var/www/web/libraries/
 ADD --chown=node:node ./compose/web/themes/ /var/www/web/themes/
 ADD --chown=node:node compose/web/themes/ /var/www/web/themes/
 ADD --chown=node:node /compose/web/themes/ /var/www/web/themes/
