@@ -54,4 +54,4 @@ RUN composer -n config --global allow-plugins true \
     && COMPOSER_DIR=$(composer -n config --global home) && echo $COMPOSER_DIR \
     && $COMPOSER_DIR/vendor/bin/phpcs --config-set installed_paths $COMPOSER_DIR/vendor/drupal/coder/coder_sniffer,$COMPOSER_DIR/vendor/sirbrillig/phpcs-variable-analysis,$COMPOSER_DIR/vendor/slevomat/coding-standard
 RUN COMPOSER_MEMORY_LIMIT=-1 composer install --ignore-platform-reqs --no-interaction --optimize-autoloader \
-    && chown www-data:www-data /var/www/composer.json /var/www/composer.lock
+   # && chown www-data:www-data /var/www/composer.json /var/www/composer.lock
