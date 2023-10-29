@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: checkout
-       uses: actions/checkout@3
+       uses: actions/checkout@v3
 
      - name: Start Container image
        run: docker run -d --name composer -v ${{ github.workspace }}:/theme natep18f/container-themebuild-test:container-build-composer
