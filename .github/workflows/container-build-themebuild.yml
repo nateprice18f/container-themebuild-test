@@ -14,20 +14,19 @@ jobs:
      - name: checkout
        uses: actions/checkout@v3
 
-     - name: Start Container image
-       run: docker run -d --name composer -v ${{ github.workspace }}:/var/www natep18f/container-themebuild-test:container-build-composer
-
-     - name: Copy Work Dir
-       run: docker cp . composer:/var/www
+     - name: Start Container 
+       run: docker run -d --name composer natep18f/container-themebuild-test:container-build-composer
        
-     - name: Zip container folder
-       run: docker exec composer zip -r release.zip /var/www
+     - name: Copy files from container to host
+       run: |
+        docker cp composer:/var/www .
 
-     - name: Copy zip from container to host
-       run: docker cp composer:/var/www/release.zip .
+     - name: zip
+       run: |
+         zip -r compose-theme.zip /var/www
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
        with:
-         name: artifact
-         path: release.zip
+         name: compose-theme
+         path: ./compose-theme.zip
