@@ -1,14 +1,14 @@
-name: Run Composer Container - Saves themes and library to artifacts 
+name: Run Composer Container, saves themes and library to artifacts then builds theme container
 
 on:
   push:
-    branches: [ container-build-themebuild ]
+    branches: [ container-build-themebuild1 ]
   pull_request:
-    branches: [ container-build-themebuild ]
+    branches: [ container-build-themebuild1 ]
 
 jobs:
   compose:
-    name: Compose Container
+    name: Compose artifact creation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -27,11 +27,8 @@ jobs:
         id: extract-file
         run: |
           mkdir theme
-          mkdir library
-          docker cp composer:/var/www/web/themes theme
+          docker cp composer:/var/www/web theme
           ls theme
-          ls library
-          docker cp composer:/var/www/web/libraries library
           docker rm composer
       #- name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
@@ -46,14 +43,15 @@ jobs:
           name: theme
           path: theme.tar
 
-      - name: Tar library files
-        run: |
-          tar -cvf library.tar library
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: library
-          path: library.tar
+      #- name: Tar library files
+      #  run: |
+      #    tar -cvf library.tar library
+          
+      #- name: Upload artifact
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: library
+      #    path: library.tar
           
   build-theme:
     needs: compose
@@ -63,20 +61,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        id: library
-        with:
-          name: library
-          path: library.tar
-          
+
       - name: Download artifact
         uses: actions/download-artifact@v3
         id: theme
         with:
           name: theme
           path: theme.tar
+          
+      #- name: Download artifact
+      #  uses: actions/download-artifact@v3
+      #  id: library
+      #  with:
+      #    name: library
+      #    path: library.tar    
           
       - name: 'Echo download path'
         run: |
