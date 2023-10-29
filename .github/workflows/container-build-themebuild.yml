@@ -27,6 +27,7 @@ jobs:
         id: extract-file
         run: |
           mkdir theme
+          mkdir library
           docker cp composer:/var/www/web/themes theme
           cd theme
           ls
