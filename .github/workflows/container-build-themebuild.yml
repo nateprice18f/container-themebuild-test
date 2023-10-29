@@ -54,10 +54,10 @@ jobs:
 
       - name: Download artifact
         uses: actions/download-artifact@v3
-        id: theme
+        id: compose
         with:
-          name: theme
-          path: theme.tar
+          name: compose
+          path: compose.tar
           
       - name: Workspace data post
         run: |
