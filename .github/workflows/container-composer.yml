@@ -70,16 +70,16 @@ jobs:
         run: |
           mkdir compose
           docker run --name composer natep18f/container-themebuild-test:container-build-composer 
-          docker cp composer:/var/www/web compose
+          docker cp composer:/var/www/ compose
           cd compose
           pwd
              
-      - name: Tar compose files
-        run: |
-          tar -cvf compose.tar compose
+      #- name: Tar compose files
+       # run: |
+       #   tar -cvf compose.tar compose
         
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: compose
-          path: compose.tar
+          path: compose
