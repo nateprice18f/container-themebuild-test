@@ -27,7 +27,7 @@ jobs:
         id: extract-file
         run: |
           mkdir theme
-          docker cp composer:/var/www/theme theme
+          docker cp composer:/var/www theme
           docker rm composer
       #- name: Copy workdir
         #run: docker cp $(docker create ${{ secrets.DOCKER_HUB_USERNAME }}/container-themebuild-test:container-build-composer):/var/www/theme theme
