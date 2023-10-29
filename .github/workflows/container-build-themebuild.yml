@@ -15,16 +15,16 @@ jobs:
        uses: actions/checkout@v3
 
      - name: Start Container image
-       run: docker run -d --name composer -v ${{ github.workspace }}:/theme natep18f/container-themebuild-test:container-build-composer
+       run: docker run -d --name composer -v ${{ github.workspace }}:/var/www natep18f/container-themebuild-test:container-build-composer
 
      - name: Copy Work Dir
-       run: docker cp . composer:/theme
+       run: docker cp . composer:/var/www
        
      - name: Zip container folder
-       run: docker exec composer zip -r release.zip /theme
+       run: docker exec composer zip -r release.zip /var/www
 
      - name: Copy zip from container to host
-       run: docker cp composer:/theme/release.zip .
+       run: docker cp composer:/var/www/release.zip .
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
