@@ -27,7 +27,12 @@ jobs:
           docker cp composer:/var/www/web compose
           cd compose
           pwd
-
+          
+      - name: Workspace data
+        run: |
+            echo ${{ github.workspace }}
+            echo $GITHUB_WORKSPACE
+            
       - name: Tar compose files
         run: |
           tar -cvf compose.tar compose
