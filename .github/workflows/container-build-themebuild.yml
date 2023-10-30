@@ -7,7 +7,35 @@ on:
     branches: [ container-build-themebuild ]
 
 jobs:  
+  run-composer:
+    name: Start container image
+    runs-on: ubuntu-latest
+    steps:
+     - name: checkout
+       uses: actions/checkout@v3
+       
+     - name: make dir
+       run:  mkdir composer
+       
+     - name: Start Container 
+       run: docker run -d --name composer natep18f/container-themebuild-test:container-build-composer
+       
+     - name: Copy files from container to host
+       run: |
+        docker cp composer:/var/www ${{ github.workspace }}/composer
+
+     - name: zip
+       run: |
+         zip -r compose-theme.zip ${{ github.workspace }}/composer/*
+       
+     - name: Upload Artifact
+       uses: actions/upload-artifact@v2
+       with:
+         name: compose-theme
+         path: compose-theme.zip
+         
   build-theme:
+    needs: run-composer
     name: Uses artifacts to create theme-builder container
     runs-on: ubuntu-latest
     
