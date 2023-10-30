@@ -47,10 +47,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
          path: compose-theme.zip
-       
-      - name: Unzip
-        run: |
-          unzip compose-theme.zip -d composer
           
       - name: Generate Docker metadata
         id: meta
@@ -79,7 +75,7 @@ jobs:
       - name: Build and push image to Docker Hub
         uses: docker/build-push-action@v4
         with:
-          context: ${{ github.workspace }}/composer
+          context: ${{ github.workspace }}/compose-theme.zip/compose-theme
           file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
