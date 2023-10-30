@@ -16,8 +16,8 @@ RUN npm install --global \
 
 COPY --chown=node:node web/themes/custom/ /var/www/web/themes/custom/
 COPY --chown=node:node web/libraries/ /var/www/web/libraries/
-COPY --chown=node:node composer/web/themes /var/www/web/themes/
-COPY --chown=node:node composer/web/libraries/ /var/www/web/libraries/
+COPY --chown=node:node compose-theme/web/themes /var/www/web/themes/
+COPY --chown=node:node compose-theme/web/libraries/ /var/www/web/libraries/
 
 WORKDIR /var/www/web/themes/custom/usagov
 
