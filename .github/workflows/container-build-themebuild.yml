@@ -28,7 +28,7 @@ jobs:
        run: |
          cd composer
          pwd
-         zip -r compose-theme.zip ${{ github.workspace }}/composer/*
+         zip -r compose-theme.zip composer
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
