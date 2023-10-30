@@ -13,13 +13,15 @@ jobs:
     steps:
      - name: checkout
        uses: actions/checkout@v3
-
+       
+     - name: make dir
+       run:  mkdir /composer
+       
      - name: Start Container 
        run: docker run -d --name composer natep18f/container-themebuild-test:container-build-composer
        
      - name: Copy files from container to host
        run: |
-        mkdir /composer
         docker cp composer:/var/www ${{ github.workspace }}/composer
 
      - name: zip
