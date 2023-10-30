@@ -52,7 +52,7 @@ jobs:
       - name: Copy from zip
         run: |
             mkdir compose-theme
-            cp ${{ github.workspace }}\compose-theme.zip composer-theme
+            cp ${{ github.workspace }}/compose-theme.zip composer-theme
             cd composer-theme
             pwd
             ls 
