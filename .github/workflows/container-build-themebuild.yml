@@ -26,15 +26,13 @@ jobs:
 
      - name: zip
        run: |
-         cd composer
-         pwd
-         zip -r compose-theme1.zip ${{ github.workspace }}/composer/*
+         zip -r compose-theme.zip ${{ github.workspace }}/composer/*
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
        with:
          name: compose-theme
-         path: compose-theme1.zip
+         path: compose-theme.zip
          
   build-theme:
     needs: run-composer
@@ -48,12 +46,9 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-         path: compose-theme1.zip
-         
-      - name: list pwd
-        run: |
-         cd ${{ github.workspace }}/compose-theme.zip
-         
+         name: compose-theme
+         path: compose-theme/www
+          
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -81,8 +76,9 @@ jobs:
       - name: Build and push image to Docker Hub
         uses: docker/build-push-action@v4
         with:
+          context: ${{ github.workspace }}/composer
           file: Dockerfile
-          push: false
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64, linux/arm64
