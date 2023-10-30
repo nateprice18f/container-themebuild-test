@@ -47,13 +47,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
          name: compose-theme
-         path: compose-theme.zip
+         path: ${{ github.workspace }}\compose-theme.zip
 
       - name: Copy from zip
         run: |
             mkdir compose-theme
-            cp /home/runner/work/container-themebuild-test/container-themebuild-test/compose-theme.zip compose-theme
-            cd compose-theme
+            cp ${{ github.workspace }}\compose-theme.zip composer-theme
+            cd composer-theme
             pwd
             ls 
       
