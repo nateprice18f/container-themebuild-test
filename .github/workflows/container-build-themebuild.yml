@@ -47,8 +47,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
          name: compose-theme
-         path: compose-theme/www
-          
+         path: compose-theme.zip
+
+      - name: Copy from zip
+        run: |
+            mkdir compose-theme
+            cp /home/runner/work/container-themebuild-test/container-themebuild-test/compose-theme.zip compose-theme
+            cd compose-theme
+            pwd
+            ls 
+      
       - name: Generate Docker metadata
         id: meta
         uses: docker/metadata-action@v4
