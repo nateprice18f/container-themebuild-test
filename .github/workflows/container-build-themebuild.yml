@@ -46,11 +46,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-         name: compose-theme
          path: compose-theme.zip
-         
-      - name: Make dir
-        run:  mkdir composer
        
       - name: Unzip
         run: |
