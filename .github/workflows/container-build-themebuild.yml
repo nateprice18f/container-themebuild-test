@@ -23,7 +23,7 @@ jobs:
 
      - name: zip
        run: |
-         zip -r compose-theme.zip ${{ github.workspace }}/container-themebuild-test//container-themebuild-test/*
+         zip -r compose-theme.zip ${{ github.workspace }}/container-themebuild-test/container-themebuild-test/*
        
      - name: Upload Artifact
        uses: actions/upload-artifact@v2
