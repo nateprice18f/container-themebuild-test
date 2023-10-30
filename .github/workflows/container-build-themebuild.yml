@@ -47,11 +47,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
          name: compose-theme
-         path: ${{ github.workspace }}\compose-theme.zip
+         path: ${{ github.workspace }}/compose-theme.zip
 
       - name: Copy from zip
         run: |
-            mkdir compose-theme
+            mkdir composer-theme
             cp ${{ github.workspace }}/compose-theme.zip composer-theme
             cd composer-theme
             pwd
