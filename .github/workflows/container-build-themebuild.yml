@@ -48,7 +48,6 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-         name: compose-theme
          path: compose-theme1.zip
          
       - name: list pwd
